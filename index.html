@@ -47,7 +47,13 @@ input[type=range]{width:100%;accent-color:var(--primary);min-height:44px}
 .portion b{display:block;font-size:20px;color:var(--text)}
 .portion span{font-size:13px;color:var(--text-muted)}
 details{margin-top:10px}
-summary{cursor:pointer;color:var(--primary-deep);font-weight:700;min-height:32px;display:flex;align-items:center}
+summary{cursor:pointer;color:var(--primary-deep);font-weight:700;min-height:32px;display:flex;align-items:center;gap:6px;list-style:none}
+summary::-webkit-details-marker{display:none}
+summary::before{content:"▸";transition:transform .15s}
+details[open]>summary::before{transform:rotate(90deg)}
+.bar{position:fixed;left:0;right:0;bottom:0;background:var(--primary-deep);color:#fff;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px;z-index:5}
+#feeding-calc .bar a{color:#fff;font-weight:700;min-height:44px;display:inline-flex;align-items:center}
+@media (min-width:900px){.bar{display:none!important}}
 .how{background:var(--bg);border-radius:12px;padding:10px 14px;margin-top:6px;font-size:15px}
 .how ol,.how ul{margin:4px 0;padding-left:1.3em}
 .claim{border-left:3px solid var(--primary);padding:4px 0 4px 10px;margin:8px 0}
@@ -60,6 +66,7 @@ summary{cursor:pointer;color:var(--primary-deep);font-weight:700;min-height:32px
 .sources li{margin:6px 0}
 footer.fc-foot{margin-top:28px;color:var(--text-muted);font-size:14px;border-top:1px solid var(--line);padding-top:16px}
 .copy{font:inherit;min-height:44px;border:1px solid var(--primary);background:#fff;color:var(--primary-deep);border-radius:999px;padding:6px 16px;cursor:pointer;margin-top:12px}
+@media (max-width:899px){#feeding-calc{padding-bottom:80px}}
 @media (max-width:420px){.card{padding:16px}input[type=number]{width:6.5em}}
 </style>
 </head>
@@ -158,6 +165,7 @@ footer.fc-foot{margin-top:28px;color:var(--text-muted);font-size:14px;border-top
     <p><a href="https://cathealthtw.com/">貓健康站</a>的互動工具。全部在你的瀏覽器裡計算，不送出任何資料。</p>
     <p>規格書與原始碼：<a href="https://github.com/Chen-MouChin/cat-feeding-calculator">github.com/Chen-MouChin/cat-feeding-calculator</a></p>
   </footer>
+  <div class="bar" id="bar" hidden><span id="barText"></span><a href="#outTitle">看結果 ↓</a></div>
 </main>
 
 <script id="claims" type="application/json">
@@ -361,7 +369,8 @@ if (typeof module !== "undefined") module.exports = Calc;
     if (!hasDry && !hasWet && rows.length) out.push(`<p class="msg">填上包裝的熱量，就能換成克數或罐數。</p>`);
     const food = { dryPer100, wetPer100, wetPerCan, wetShare: Number(s.mix) / 100, treat: s.treat };
     const meals = Number(s.meals) || 3;
-    for (const r of rows) {
+    const ordered = [...rows].sort((a, b) => (b.key === "aaha-loss") - (a.key === "aaha-loss"));
+    for (const r of ordered) {
       const def = ROWS[r.key];
       const p = { lo: Calc.portion(r.low, food), hi: Calc.portion(r.high, food) };
       const hows = def.how(e, r);
@@ -374,7 +383,10 @@ if (typeof module !== "undefined") module.exports = Calc;
         <div class="big">${range(r.low, r.high, 0, " 大卡")}<small style="font-size:16px;font-weight:500;color:var(--text-muted)">／天</small></div>
         ${portionHTML(p, meals)}
         <details><summary>怎麼算的</summary><div class="how"><ol>${hows.map((h) => `<li>${h}</li>`).join("")}</ol>${def.claims.map(claimHTML).join("")}</div></details></div>`);
+      if (r.key === "aaha-loss") out.push(`<p class="msg">減重的熱量用理想體重來算<span class="cid">C-CALC-06</span>。下面是用目前體重算的維持量，只供對照。</p>`);
     }
+    const first = ordered[0];
+    $("barText").textContent = first ? `每天 ${range(first.low, first.high)} 大卡（${ROWS[first.key].name.split("：")[0]}）` : "填好資料就會算出結果";
     if (rows.length > 1 && e.ok) out.push(`<p class="hint">幾種算法並列，是因為不同指引用的公式不同。先從範圍裡選一個量開始，再看體態調整。</p>`);
     $("out").innerHTML = out.join("");
     writeURL(s);
@@ -423,6 +435,12 @@ if (typeof module !== "undefined") module.exports = Calc;
     catch { $("copy").textContent = "請直接複製網址列"; }
     setTimeout(() => ($("copy").textContent = "複製這組設定的連結"), 2000);
   });
+
+  // 手機版：結果在輸入下面，輸入區還在畫面上時，底部顯示一行結果
+  if ("IntersectionObserver" in window) {
+    const io = new IntersectionObserver(([en]) => { $("bar").hidden = !en.isIntersecting; }, { threshold: 0.15 });
+    io.observe(form);
+  }
 
   readURL();
   staticParts();

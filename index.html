@@ -60,9 +60,11 @@ details[open]>summary::before{transform:rotate(90deg)}
 .claim q{display:block;color:var(--text-muted);font-size:14px;font-style:italic;quotes:none}
 .claim .src{font-size:13px;color:var(--text-muted)}
 .cid{font-family:ui-monospace,Consolas,monospace;font-size:12px;color:var(--primary-deep);background:var(--primary-pale);border-radius:6px;padding:0 6px;white-space:nowrap}
-button.cid{border:0;cursor:pointer;min-height:28px;margin:0 2px;padding:2px 8px;text-decoration:underline dotted}
+button.cid{border:0;cursor:pointer;min-height:28px;margin:0 2px;padding:2px 8px;text-decoration:underline dotted;position:relative}
+button.cid::after{content:"";position:absolute;inset:-8px -2px}
+.claim>.cid{background:none;padding:0;color:var(--text-muted)}
 dialog{max-width:min(560px,calc(100vw - 32px));border:1px solid var(--border);border-radius:16px;padding:20px;background:var(--bg-card);color:var(--text)}
-dialog::backdrop{background:rgba(29,29,31,.35)}
+dialog::backdrop{background:color-mix(in srgb,var(--text) 35%,transparent)}
 .why{margin-top:20px}
 .why li{margin:6px 0}
 .sources{font-size:15px;padding-left:1.3em}
@@ -99,10 +101,11 @@ footer.fc-foot{margin-top:28px;color:var(--text-muted);font-size:14px;border-top
       <fieldset id="adultBox">
         <legend>活動量</legend>
         <div class="seg">
-          <label><input type="radio" name="act" value="indoor" checked>結紮或住室內</label>
-          <label><input type="radio" name="act" value="active">沒結紮、一般活動量</label>
+          <label><input type="radio" name="act" value="indoor" checked>結紮或住室內（或兩者都是）</label>
+          <label><input type="radio" name="act" value="active">沒結紮、會外出</label>
         </div>
-        <p class="hint">大多數家貓結紮，活動量也少<button type="button" class="cid" data-c="C-CALC-10">C-CALC-10</button>。</p>
+        <p class="hint" id="actHint">大多數家貓結紮，活動量也少<button type="button" class="cid" data-c="C-CALC-10">C-CALC-10</button>。</p>
+        <p class="hint" id="actLossHint" hidden>減重時用理想體重算，不使用活動量。</p>
         <label class="check" style="margin-top:12px"><input type="checkbox" id="lose" name="lose"><span>獸醫建議減重</span></label>
         <div class="sub" id="loseBox" hidden>
           <label class="lbl" for="target">理想體重</label>
@@ -138,10 +141,11 @@ footer.fc-foot{margin-top:28px;color:var(--text-muted);font-size:14px;border-top
 
       <h2>3. 餵法</h2>
       <fieldset>
-        <label class="check"><input type="checkbox" id="treat" name="treat"><span>會給零食：主食扣掉 10%，當作零食的上限<button type="button" class="cid" data-c="C-TRT-01">C-TRT-01</button></span></label>
+        <label class="check"><input type="checkbox" id="treat" name="treat"><span>會給零食：主食扣掉 10%，當作零食的上限</span></label>
+        <p class="hint" style="margin-left:30px">出處<button type="button" class="cid" data-c="C-TRT-01">C-TRT-01</button></p>
       </fieldset>
       <fieldset>
-        <label class="lbl" for="meals">一天分幾餐<button type="button" class="cid" data-c="C-FEED-01">C-FEED-01</button></label>
+        <div class="row"><label class="lbl" for="meals" style="margin:0">一天分幾餐</label><button type="button" class="cid" data-c="C-FEED-01">C-FEED-01</button></div>
         <select id="meals" name="meals"><option>2</option><option selected>3</option><option>4</option><option>5</option><option>6</option></select>
       </fieldset>
     </form>
@@ -168,7 +172,7 @@ footer.fc-foot{margin-top:28px;color:var(--text-muted);font-size:14px;border-top
     <p><a href="https://cathealthtw.com/">貓健康站</a>的互動工具。全部在你的瀏覽器裡計算，不送出任何資料。</p>
     <p>規格書與原始碼：<a href="https://github.com/Chen-MouChin/cat-feeding-calculator">github.com/Chen-MouChin/cat-feeding-calculator</a></p>
   </footer>
-  <dialog id="dlg" aria-labelledby="dlgTitle"><h2 id="dlgTitle" style="font-size:18px;margin:0 0 8px">出處</h2><div id="dlgBody"></div><form method="dialog"><button class="copy">關閉</button></form></dialog>
+  <dialog id="dlg" aria-labelledby="dlgTitle"><h2 id="dlgTitle" style="font-size:18px;margin:0 0 8px">出處</h2><div id="dlgBody"></div><form method="dialog"><button class="copy" autofocus>關閉</button></form></dialog>
   <div class="bar" id="bar" hidden><span id="barText"></span><a href="#outTitle">看結果 ↓</a></div>
 </main>
 
@@ -230,7 +234,7 @@ footer.fc-foot{margin-top:28px;color:var(--text-muted);font-size:14px;border-top
    "src": "FEDIAF-NUTRITION-GUIDELINES-2025",
    "page": 57,
    "zh": "結紮或住室內的成貓，平均每日熱量需求是每公斤代謝體重（體重^0.67）52–75 大卡",
-   "quote": "Average daily energy requirements of adult cats Table VII-10. Average energy requirements during growth and reproduction in cats Gender - Activity kcal ME per kg BW0.67 kcal ME per kg BW (4 kg cat) kJ ME per kg BW0.67 kJ ME per kg BW (4 kg cat) Neutered and/or indoor cats 52 - 75"
+   "quote": "Average daily energy requirements of adult cats … Gender - Activity kcal ME per kg BW0.67 kcal ME per kg BW (4 kg cat) kJ ME per kg BW0.67 kJ ME per kg BW (4 kg cat) Neutered and/or indoor cats 52 - 75"
   },
   "C-CALC-02": {
    "src": "FEDIAF-NUTRITION-GUIDELINES-2025",
@@ -253,7 +257,7 @@ footer.fc-foot{margin-top:28px;color:var(--text-muted);font-size:14px;border-top
   "C-KCAL-09": {
    "src": "WSAVA-CALORIE-CAT-2020",
    "page": 1,
-   "zh": "WSAVA 熱量表的範圍由 2006 年 NRC 的兩條公式算出：精瘦成貓 100 × 體重^0.67，容易胖的成貓 130 × 體重^0.4",
+   "zh": "WSAVA 熱量表的範圍由 2006 年美國國家研究委員會（NRC）的兩條公式算出：精瘦成貓 100 × 體重^0.67，容易胖的成貓 130 × 體重^0.4",
    "quote": "Reference calculations used: 2006 NRC Daily Maintenance Energy Requirement for Cats. Lean Adult: 100 kcal x BWkg Obese-prone Adult: 130 kcal x BWkg0.4 0.67"
   },
   "C-KCAL-05": {
@@ -473,7 +477,7 @@ if (typeof module !== "undefined") module.exports = Calc;
   const ROWS = {
     "fediaf-indoor": { name: "FEDIAF：結紮或住室內的成貓", claims: ["C-CALC-01"],
       how: (e, r) => [MW(e), `52 × ${fmt(e.mw, 2)} = ${r.low} 大卡`, `75 × ${fmt(e.mw, 2)} = ${r.high} 大卡`] },
-    "fediaf-active": { name: "FEDIAF：沒結紮、一般活動量的成貓", claims: ["C-CALC-02", "C-KCAL-08"],
+    "fediaf-active": { name: "FEDIAF：活動的成貓（Active cats）", claims: ["C-CALC-02", "C-KCAL-08"],
       how: (e, r) => [MW(e), `100 × ${fmt(e.mw, 2)} = ${r.low} 大卡`] },
     "fediaf-kitten": { name: "FEDIAF：幼貓", claims: ["C-CALC-03", "C-KCAL-08"],
       how: (e, r) => [MW(e),
@@ -493,7 +497,7 @@ if (typeof module !== "undefined") module.exports = Calc;
     targetEmpty: "請填獸醫建議的理想體重。",
   };
   // 單位檢查用的寬鬆範圍（不是營養建議，只用來發現單位選錯）
-  const SANE = { dry: [150, 800], wet: [30, 300], can: [10, 500] };
+  const SANE = { dry: [150, 800], wet: [20, 300], can: [10, 800] };
 
   function read() {
     const f = new FormData(form);
@@ -530,11 +534,14 @@ if (typeof module !== "undefined") module.exports = Calc;
     let wetPerCan = s.wu === "can" ? (Number(s.wk) > 0 ? Number(s.wk) : null)
       : (wetPer100 && Number(s.cg) > 0 ? (wetPer100 * Number(s.cg)) / 100 : null);
     if (!inRange(dryPer100, SANE.dry)) {
-      out.push(`<p class="msg">乾糧換算成每 100 克 ${fmt(dryPer100, 1)} 大卡，和一般乾糧差很多。單位是不是選錯了？請對照包裝。</p>`);
+      out.push(`<p class="msg">乾糧換算成每 100 克 ${fmt(dryPer100, 1)} 大卡，超出本工具接受的範圍（每 100 克 ${SANE.dry.join("–")} 大卡）。請對照包裝確認單位。</p>`);
       dryPer100 = null;
     }
-    if (!inRange(wetPer100, SANE.wet) || (s.wu === "can" && !inRange(wetPerCan, SANE.can))) {
-      out.push(`<p class="msg">罐頭的熱量看起來不太對（${s.wu === "can" ? `每罐 ${fmt(wetPerCan)} 大卡` : `每 100 克 ${fmt(wetPer100, 1)} 大卡`}），單位是不是選錯了？請對照包裝。</p>`);
+    if (!inRange(wetPer100, SANE.wet)) {
+      out.push(`<p class="msg">罐頭換算成每 100 克 ${fmt(wetPer100, 1)} 大卡，超出本工具接受的範圍（每 100 克 ${SANE.wet.join("–")} 大卡）。請對照包裝確認單位。</p>`);
+      wetPer100 = wetPerCan = null;
+    } else if (!inRange(wetPerCan, SANE.can)) {
+      out.push(`<p class="msg">罐頭算出來每罐 ${fmt(wetPerCan)} 大卡，超出本工具接受的範圍（每罐 ${SANE.can.join("–")} 大卡）。請確認單位和罐重。</p>`);
       wetPer100 = wetPerCan = null;
     }
     const hasDry = !!dryPer100, hasWet = !!(wetPer100 || wetPerCan);
@@ -542,6 +549,9 @@ if (typeof module !== "undefined") module.exports = Calc;
     $("mixOut").textContent = s.mix;
 
     const loss = s.stage === "adult" && s.lose;
+    for (const r of form.elements.act) r.disabled = loss;
+    $("actHint").hidden = loss;
+    $("actLossHint").hidden = !loss;
     const e = Calc.energy({ weightKg: s.w, stage: s.stage, activity: s.act, ageMonths: s.age, targetKg: loss ? s.target : undefined });
     if (!e.ok) out.push(`<p class="msg">${NEED[e.need]}</p>`);
     else if (loss && !s.target) out.push(`<p class="msg">${NEED.targetEmpty}</p>`);
@@ -572,7 +582,7 @@ if (typeof module !== "undefined") module.exports = Calc;
         <details><summary>怎麼算的</summary><div class="how"><ol>${hows.map((h) => `<li>${h}</li>`).join("")}</ol>${claims.map(claimHTML).join("")}</div></details></div>`);
     }
     if (lossRow) out.push(`<p class="hint">減重的熱量用理想體重來算${chip("C-CALC-06")}；WSAVA 熱量表的對象是理想體態的成貓${chip("C-CALC-07")}。勾了減重時，這裡不列用目前體重算的維持量。</p>`);
-    else if (rows.length > 1) out.push(`<p class="hint">各指引的公式不同（FEDIAF${chip("C-CALC-01")}、WSAVA${chip("C-KCAL-09")}），這裡並列。獸醫和飼主要經常看體態，再調整餵的量${chip("C-BCS-06")}。</p>`);
+    else if (rows.length > 1) out.push(`<p class="hint">各指引的公式不同（FEDIAF${chip(rows[0].key === "fediaf-active" ? "C-CALC-02" : "C-CALC-01")}、WSAVA${chip("C-KCAL-09")}），這裡並列。獸醫和飼主要經常看體態，再調整餵的量${chip("C-BCS-06")}。</p>`);
     $("out").innerHTML = out.join("");
     const first = rows[0];
     $("barText").textContent = first ? `每天 ${range(first.low, first.high)} 大卡（${ROWS[first.key].name.split("：")[0]}）` : "填好資料就會算出結果";
@@ -609,7 +619,7 @@ if (typeof module !== "undefined") module.exports = Calc;
     $("why").innerHTML = [
       ["每隻貓需要的熱量差很多；沒有一個公式能算出所有貓的需求，公式只能預測一群貓的平均。", ["C-KCAL-02", "C-KCAL-07"]],
       ["熱量表只是參考；有的貓要多吃、有的要少吃，才能維持理想體態。", ["C-KCAL-05"]],
-      ["係數只是估算熱量的一般原則，不太活動或住室內的貓可能需要更少。", ["C-CALC-11"]],
+      ["AAHA 的生命階段係數只是估算熱量的一般原則，不太活動或住室內的可能需要更少。", ["C-CALC-11"]],
       ["獸醫和飼主要經常看體態，再調整餵的量。", ["C-BCS-06"]],
       ["不管是讓貓自由取食還是分餐，都用秤追蹤一天總共吃了多少。", ["C-FEED-08"]],
       ["零食的熱量要算進每天的份量，而且不超過 10%。", ["C-TRT-01", "C-TRT-03"]],
@@ -628,6 +638,7 @@ if (typeof module !== "undefined") module.exports = Calc;
     $("dlgBody").innerHTML = claimHTML(b.dataset.c) + `<p class="hint"><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.title)}</a>（${s.year}）</p>`;
     $("dlg").showModal();
   });
+  $("dlg").addEventListener("click", (ev) => { if (ev.target === $("dlg")) $("dlg").close(); });   // 點對話框外面也能關
 
   $("copy").addEventListener("click", async () => {
     try { await navigator.clipboard.writeText(location.href); $("copy").textContent = "已複製連結"; }

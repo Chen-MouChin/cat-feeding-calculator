@@ -58,8 +58,16 @@ def main() -> int:
         q = norm(c["quote"])
         if len(q.split()) < 6 and not re.search(r"\d", q):
             print(f"FAIL  {cid}：原句太短"); fails += 1; continue
-        if q not in pg.get(c["page"], ""):
-            other = [p for p, t in pg.items() if q in t]
+        parts = [norm(x) for x in c["quote"].split("…")]   # 用「…」跳過中間不相關的字，各段要依序出現在同一頁
+        page_text = pg.get(c["page"], "")
+        pos, found = 0, True
+        for part in parts:
+            k = page_text.find(part, pos)
+            if k < 0:
+                found = False; break
+            pos = k + len(part)
+        if not found:
+            other = [p for p, t in pg.items() if all(x in t for x in parts)]
             hint = f"（在 p.{other}）" if other else ""
             print(f"FAIL  {cid}：原句不在 p.{c['page']}{hint}"); fails += 1; continue
         extra = numbers(c["zh"]) - numbers(c["quote"])

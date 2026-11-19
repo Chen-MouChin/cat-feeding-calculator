@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>貓咪一天吃多少？每日餵食量計算器</title>
-<meta name="description" content="輸入貓的體重、生活階段和包裝上的熱量，算出一天大約幾大卡、乾糧幾克、罐頭幾罐。每個數字都附 FEDIAF、WSAVA、AAHA 指引的出處與頁碼。">
+<meta name="description" content="輸入貓的體重、生活階段和包裝上的熱量，算出一天大約幾大卡、乾糧幾克、罐頭幾罐。公式與說明附 FEDIAF、WSAVA、AAHA、AAFP 等指引與論文的出處和頁碼。">
 <style>
-:root{--bg:#f9f6f0;--bg-card:#fff;--text:#1d1d1f;--text-muted:#636368;--primary:#3b6a50;--primary-deep:#2a4c39;--primary-pale:#e7efe9;--gold:#b8860b;--line:#e8e4db;color-scheme:light}
+:root{--bg:#f9f6f0;--bg-card:#fff;--text:#1d1d1f;--text-muted:#636368;--primary:#3b6a50;--primary-deep:#2a4c39;--primary-pale:#e7efe9;--gold:#b8860b;--border:#e8e4db;--border-strong:#d4cfc3;color-scheme:light}
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"PingFang TC","Microsoft JhengHei","Noto Sans TC",sans-serif;line-height:1.65}
@@ -17,16 +17,16 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-appl
 .fc-head p{margin:0 0 20px;color:var(--text-muted);max-width:46em}
 .fc-grid{display:grid;gap:20px;grid-template-columns:1fr}
 @media (min-width:900px){.fc-grid{grid-template-columns:minmax(0,5fr) minmax(0,7fr);align-items:start}.fc-out{position:sticky;top:16px}}
-.card{background:var(--bg-card);border:1px solid var(--line);border-radius:16px;padding:20px}
+.card{background:var(--bg-card);border:1px solid var(--border);border-radius:16px;padding:20px}
 .card h2{font-size:20px;margin:0 0 12px}
 fieldset{border:0;margin:0 0 18px;padding:0;min-width:0}
 legend,.lbl{font-weight:700;margin-bottom:6px;padding:0;display:block}
 .hint{color:var(--text-muted);font-size:14px;margin:4px 0 0}
 .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-input[type=number]{font:inherit;font-size:18px;width:7.5em;min-height:44px;padding:6px 10px;border:1px solid #c9c4b8;border-radius:10px;background:#fff;color:var(--text)}
-select{font:inherit;min-height:44px;padding:6px 8px;border:1px solid #c9c4b8;border-radius:10px;background:#fff;color:var(--text)}
+input[type=number]{font:inherit;font-size:18px;width:7.5em;min-height:44px;padding:6px 10px;border:1px solid var(--text-muted);border-radius:10px;background:var(--bg-card);color:var(--text)}
+select{font:inherit;min-height:44px;padding:6px 8px;border:1px solid var(--text-muted);border-radius:10px;background:var(--bg-card);color:var(--text)}
 .seg{display:flex;flex-wrap:wrap;gap:8px}
-.seg label{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:6px 14px;border:1px solid #c9c4b8;border-radius:999px;cursor:pointer;background:#fff}
+.seg label{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:6px 14px;border:1px solid var(--text-muted);border-radius:999px;cursor:pointer;background:var(--bg-card)}
 .seg input{accent-color:var(--primary);width:18px;height:18px;margin:0}
 .seg label:has(input:checked){border-color:var(--primary);background:var(--primary-pale);color:var(--primary-deep);font-weight:700}
 .check{display:flex;gap:10px;align-items:flex-start;min-height:44px;cursor:pointer}
@@ -38,7 +38,7 @@ input[type=range]{width:100%;accent-color:var(--primary);min-height:44px}
 [hidden]{display:none!important}
 .msg{background:var(--primary-pale);color:var(--primary-deep);border-radius:12px;padding:12px 14px;margin:0 0 12px}
 .big{font-size:clamp(28px,5vw,40px);font-weight:700;color:var(--primary-deep);line-height:1.2}
-.res{border-top:1px solid var(--line);padding:14px 0}
+.res{border-top:1px solid var(--border);padding:14px 0}
 .res:first-of-type{border-top:0;padding-top:4px}
 .res h3{font-size:16px;margin:0 0 4px;color:var(--text-muted);font-weight:700}
 .res h3 .tag{display:inline-block;font-size:12px;border:1px solid var(--gold);color:var(--text);border-radius:999px;padding:0 8px;margin-left:6px;vertical-align:2px;font-weight:500}
@@ -47,12 +47,12 @@ input[type=range]{width:100%;accent-color:var(--primary);min-height:44px}
 .portion b{display:block;font-size:20px;color:var(--text)}
 .portion span{font-size:13px;color:var(--text-muted)}
 details{margin-top:10px}
-summary{cursor:pointer;color:var(--primary-deep);font-weight:700;min-height:32px;display:flex;align-items:center;gap:6px;list-style:none}
+summary{cursor:pointer;color:var(--primary-deep);font-weight:700;min-height:44px;display:flex;align-items:center;gap:6px;list-style:none}
 summary::-webkit-details-marker{display:none}
 summary::before{content:"▸";transition:transform .15s}
 details[open]>summary::before{transform:rotate(90deg)}
-.bar{position:fixed;left:0;right:0;bottom:0;background:var(--primary-deep);color:#fff;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px;z-index:5}
-#feeding-calc .bar a{color:#fff;font-weight:700;min-height:44px;display:inline-flex;align-items:center}
+.bar{position:fixed;left:0;right:0;bottom:0;background:var(--primary-deep);color:var(--bg-card);padding:10px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px;z-index:5}
+#feeding-calc .bar a{color:var(--bg-card);font-weight:700;min-height:44px;display:inline-flex;align-items:center}
 @media (min-width:900px){.bar{display:none!important}}
 .how{background:var(--bg);border-radius:12px;padding:10px 14px;margin-top:6px;font-size:15px}
 .how ol,.how ul{margin:4px 0;padding-left:1.3em}
@@ -60,12 +60,15 @@ details[open]>summary::before{transform:rotate(90deg)}
 .claim q{display:block;color:var(--text-muted);font-size:14px;font-style:italic;quotes:none}
 .claim .src{font-size:13px;color:var(--text-muted)}
 .cid{font-family:ui-monospace,Consolas,monospace;font-size:12px;color:var(--primary-deep);background:var(--primary-pale);border-radius:6px;padding:0 6px;white-space:nowrap}
+button.cid{border:0;cursor:pointer;min-height:28px;margin:0 2px;padding:2px 8px;text-decoration:underline dotted}
+dialog{max-width:min(560px,calc(100vw - 32px));border:1px solid var(--border);border-radius:16px;padding:20px;background:var(--bg-card);color:var(--text)}
+dialog::backdrop{background:rgba(29,29,31,.35)}
 .why{margin-top:20px}
 .why li{margin:6px 0}
 .sources{font-size:15px;padding-left:1.3em}
 .sources li{margin:6px 0}
-footer.fc-foot{margin-top:28px;color:var(--text-muted);font-size:14px;border-top:1px solid var(--line);padding-top:16px}
-.copy{font:inherit;min-height:44px;border:1px solid var(--primary);background:#fff;color:var(--primary-deep);border-radius:999px;padding:6px 16px;cursor:pointer;margin-top:12px}
+footer.fc-foot{margin-top:28px;color:var(--text-muted);font-size:14px;border-top:1px solid var(--border);padding-top:16px}
+.copy{font:inherit;min-height:44px;border:1px solid var(--primary);background:var(--bg-card);color:var(--primary-deep);border-radius:999px;padding:6px 16px;cursor:pointer;margin-top:12px}
 @media (max-width:899px){#feeding-calc{padding-bottom:80px}}
 @media (max-width:420px){.card{padding:16px}input[type=number]{width:6.5em}}
 </style>
@@ -74,7 +77,7 @@ footer.fc-foot{margin-top:28px;color:var(--text-muted);font-size:14px;border-top
 <main id="feeding-calc">
   <header class="fc-head">
     <h1>貓咪一天吃多少？</h1>
-    <p>輸入貓的體重、生活階段和包裝上的熱量，算出一天大約幾大卡、乾糧幾克、罐頭幾罐。每個數字都可以點開，看用了哪一條公式、出自哪份指引的第幾頁。</p>
+    <p>輸入貓的體重、生活階段和包裝上的熱量，算出一天大約幾大卡、乾糧幾克、罐頭幾罐。公式來自歐洲寵物食品工業聯合會（FEDIAF）、世界小動物獸醫協會（WSAVA）、美國動物醫院協會（AAHA）的指引。結果下的「怎麼算的」可以展開；綠色編號點了會顯示英文原句和頁碼。</p>
   </header>
 
   <div class="fc-grid">
@@ -96,15 +99,15 @@ footer.fc-foot{margin-top:28px;color:var(--text-muted);font-size:14px;border-top
       <fieldset id="adultBox">
         <legend>活動量</legend>
         <div class="seg">
-          <label><input type="radio" name="act" value="indoor" checked>結紮或室內</label>
-          <label><input type="radio" name="act" value="active">活動量大</label>
+          <label><input type="radio" name="act" value="indoor" checked>結紮或住室內</label>
+          <label><input type="radio" name="act" value="active">沒結紮、一般活動量</label>
         </div>
-        <p class="hint">大多數家貓結紮、住在室內，選第一個。</p>
+        <p class="hint">大多數家貓結紮，活動量也少<button type="button" class="cid" data-c="C-CALC-10">C-CALC-10</button>。</p>
         <label class="check" style="margin-top:12px"><input type="checkbox" id="lose" name="lose"><span>獸醫建議減重</span></label>
         <div class="sub" id="loseBox" hidden>
-          <label class="lbl" for="target">目標體重</label>
+          <label class="lbl" for="target">理想體重</label>
           <div class="row"><input id="target" name="target" type="number" inputmode="decimal" min="0.5" max="15" step="0.1"><span class="unit">公斤</span></div>
-          <p class="hint">目標體重請和獸醫討論，這裡不幫你推算。</p>
+          <p class="hint">理想體重請和獸醫討論，這裡不幫你推算。</p>
         </div>
       </fieldset>
 
@@ -114,7 +117,7 @@ footer.fc-foot{margin-top:28px;color:var(--text-muted);font-size:14px;border-top
       </fieldset>
 
       <h2>2. 包裝上的熱量</h2>
-      <p class="hint" style="margin:-6px 0 12px">包裝上寫的「代謝能」或「熱量」（kcal）。沒寫的話，可以問廠商<span class="cid" data-c="C-KCAL-01">C-KCAL-01</span>。只填一種也可以。</p>
+      <p class="hint" style="margin:-6px 0 12px">包裝上寫的代謝能（metabolizable energy, ME）或熱量，單位是 kcal（大卡）。沒寫的話，可以問廠商<button type="button" class="cid" data-c="C-KCAL-01">C-KCAL-01</button>。只填一種也可以。</p>
       <fieldset>
         <label class="lbl" for="dk">乾糧</label>
         <div class="row"><input id="dk" name="dk" type="number" inputmode="decimal" min="0" step="1" value="3800" aria-describedby="duHint">
@@ -135,10 +138,10 @@ footer.fc-foot{margin-top:28px;color:var(--text-muted);font-size:14px;border-top
 
       <h2>3. 餵法</h2>
       <fieldset>
-        <label class="check"><input type="checkbox" id="treat" name="treat"><span>每天會給零食：先留 10% 熱量給零食<span class="cid" data-c="C-TRT-01">C-TRT-01</span></span></label>
+        <label class="check"><input type="checkbox" id="treat" name="treat"><span>會給零食：主食扣掉 10%，當作零食的上限<button type="button" class="cid" data-c="C-TRT-01">C-TRT-01</button></span></label>
       </fieldset>
       <fieldset>
-        <label class="lbl" for="meals">一天分幾餐<span class="cid" data-c="C-FEED-01">C-FEED-01</span></label>
+        <label class="lbl" for="meals">一天分幾餐<button type="button" class="cid" data-c="C-FEED-01">C-FEED-01</button></label>
         <select id="meals" name="meals"><option>2</option><option selected>3</option><option>4</option><option>5</option><option>6</option></select>
       </fieldset>
     </form>
@@ -165,39 +168,200 @@ footer.fc-foot{margin-top:28px;color:var(--text-muted);font-size:14px;border-top
     <p><a href="https://cathealthtw.com/">貓健康站</a>的互動工具。全部在你的瀏覽器裡計算，不送出任何資料。</p>
     <p>規格書與原始碼：<a href="https://github.com/Chen-MouChin/cat-feeding-calculator">github.com/Chen-MouChin/cat-feeding-calculator</a></p>
   </footer>
+  <dialog id="dlg" aria-labelledby="dlgTitle"><h2 id="dlgTitle" style="font-size:18px;margin:0 0 8px">出處</h2><div id="dlgBody"></div><form method="dialog"><button class="copy">關閉</button></form></dialog>
   <div class="bar" id="bar" hidden><span id="barText"></span><a href="#outTitle">看結果 ↓</a></div>
 </main>
 
 <script id="claims" type="application/json">
 {
-  "sources": {
-    "FEDIAF-NUTRITION-GUIDELINES-2025": {"short": "FEDIAF 2025", "name": "歐洲寵物食品工業聯合會（FEDIAF）", "title": "Nutritional Guidelines for Complete and Complementary Pet Food for Cats and Dogs", "year": 2025, "url": "https://europeanpetfood.org/wp-content/uploads/2025/09/FEDIAF-Nutritional-Guidelines_2025-ONLINE.pdf"},
-    "WSAVA-CALORIE-CAT-2020": {"short": "WSAVA 2020", "name": "世界小動物獸醫協會（WSAVA）全球營養委員會", "title": "Calorie Needs for an Average Healthy Adult Cat in Ideal Body Condition", "year": 2020, "url": "https://wsava.org/wp-content/uploads/2020/07/Calorie-Needs-for-Healthy-Adult-Cats-updated-July-2020.pdf"},
-    "WSAVA-SELECTING-PET-FOODS-2021": {"short": "WSAVA 2021", "name": "世界小動物獸醫協會（WSAVA）全球營養委員會", "title": "Guidelines on Selecting Pet Foods", "year": 2021, "url": "https://wsava.org/wp-content/uploads/2021/04/Selecting-a-pet-food-for-your-pet-updated-2021_WSAVA-Global-Nutrition-Toolkit.pdf"},
-    "WSAVA-NUTRITION-2011": {"short": "WSAVA 2011", "name": "Freeman L, Becvarova I, Cave N, et al.", "title": "WSAVA Nutritional Assessment Guidelines", "year": 2011, "url": "https://wsava.org/wp-content/uploads/2020/01/WSAVA-Nutrition-Assessment-Guidelines-2011-JSAP.pdf"},
-    "AAHA-NUTRITION-2021": {"short": "AAHA 2021", "name": "美國動物醫院協會（AAHA）", "title": "2021 AAHA Nutrition and Weight Management Guidelines for Dogs and Cats", "year": 2021, "url": "https://www.aaha.org/wp-content/uploads/globalassets/02-guidelines/2021-nutrition-and-weight-management/resourcepdfs/new-2021-aaha-nutrition-and-weight-management-guidelines-with-ref.pdf"},
-    "AAFP-NUTRITION-2018": {"short": "AAFP 2018", "name": "美國貓科獸醫師協會（AAFP）", "title": "Feline feeding programs: addressing behavioral needs to improve feline health and wellbeing", "year": 2018, "url": "https://catvets.com/resource/guidelines-practice-guidelines-how-to-feed-how-to-feed-a-cat-consensus-statement/"},
-    "DELGADO-2020-FEEDING-WELLBEING": {"short": "Delgado 2020", "name": "Delgado M, Dantas LMS", "title": "Feeding Cats for Optimal Mental and Behavioral Well-Being", "year": 2020, "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7415653/"}
+ "sources": {
+  "FEDIAF-NUTRITION-GUIDELINES-2025": {
+   "short": "FEDIAF 2025",
+   "name": "歐洲寵物食品工業聯合會（FEDIAF）",
+   "title": "Nutritional Guidelines for Complete and Complementary Pet Food for Cats and Dogs",
+   "year": 2025,
+   "url": "https://europeanpetfood.org/wp-content/uploads/2025/09/FEDIAF-Nutritional-Guidelines_2025-ONLINE.pdf"
   },
-  "claims": {
-    "C-CALC-01": {"src": "FEDIAF-NUTRITION-GUIDELINES-2025", "page": 57, "zh": "結紮或室內的成貓，每天每公斤代謝體重（體重^0.67）需要 52–75 大卡", "quote": "kcal ME per kg BW0.67 kcal ME per kg BW (4 kg cat) kJ ME per kg BW0.67 kJ ME per kg BW (4 kg cat) Neutered and/or indoor cats 52 - 75"},
-    "C-CALC-02": {"src": "FEDIAF-NUTRITION-GUIDELINES-2025", "page": 57, "zh": "活動量大的成貓，每天每公斤代謝體重需要 100 大卡", "quote": "Active cats 100 60 - 65 418"},
-    "C-KCAL-08": {"src": "FEDIAF-NUTRITION-GUIDELINES-2025", "page": 57, "zh": "一般活動量的成貓用 100 × 體重^0.67 大卡；室內或結紮的成貓，平均估計是 75 × 體重^0.67 大卡", "quote": "FEDIAF recommendations for normal active adult cats are in accordance with NRC (NRC 2006j) assuming a maintenance energy requirement of 100 kcal/kg BW0.67. For indoor and/or neutered adult cats the average maintenance energy requirement is estimated to be 75 kcal/kg BW0.67"},
-    "C-CALC-03": {"src": "FEDIAF-NUTRITION-GUIDELINES-2025", "page": 57, "zh": "幼貓的熱量以成貓維持需求的倍數計：未滿 4 個月 2.0–2.5 倍、4 到 9 個月 1.75–2.0 倍、9 到 12 個月 1.5 倍", "quote": "Kittens Age Times MER Up to 4 months 2.0 - 2.5 4 to 9 months 1.75 - 2.0 9 to 12 months 1.5"},
-    "C-KCAL-09": {"src": "WSAVA-CALORIE-CAT-2020", "page": 1, "zh": "WSAVA 熱量表的範圍由 2006 年 NRC 的兩條公式算出：精瘦成貓 100 × 體重^0.67，容易胖的成貓 130 × 體重^0.4", "quote": "Reference calculations used: 2006 NRC Daily Maintenance Energy Requirement for Cats. Lean Adult: 100 kcal x BWkg Obese-prone Adult: 130 kcal x BWkg0.4 0.67"},
-    "C-KCAL-05": {"src": "WSAVA-CALORIE-CAT-2020", "page": 1, "zh": "熱量表只是參考，每隻貓不一樣，有的需要更多、有的更少，以維持理想體態為準", "quote": "These recommendations are for guidance only. Cats are individuals and some may have higher or lower requirements in order to maintain an ideal, trim body condition"},
-    "C-CALC-04": {"src": "AAHA-NUTRITION-2021", "page": 8, "figure": true, "zh": "靜止能量需求（RER）＝體重（公斤）^0.75 × 70", "quote": "RER = BWkg0.75 × 70"},
-    "C-CALC-05": {"src": "AAHA-NUTRITION-2021", "page": 8, "figure": true, "zh": "每日需求＝RER × 生命階段係數；貓減重的係數是 0.8", "quote": "MER = RER × life stage factor … Weight loss 0.8"},
-    "C-CALC-06": {"src": "AAHA-NUTRITION-2021", "page": 9, "zh": "減重的熱量用理想體重來算，再依每隻貓的情況調整", "quote": "Base these calculations on ideal weight and adjust as needed for the individual patient"},
-    "C-KCAL-02": {"src": "FEDIAF-NUTRITION-GUIDELINES-2025", "page": 48, "zh": "每隻貓需要的熱量差很多，即使生活條件一樣也是", "quote": "Energy requirements vary considerably between individual dogs and cats, even between animals kept under the same conditions"},
-    "C-KCAL-07": {"src": "FEDIAF-NUTRITION-GUIDELINES-2025", "page": 48, "zh": "沒有一個公式能算出所有貓的熱量需求，公式只能預測一群貓的理論平均", "quote": "No single formula will allow to calculate the energy requirements for all dogs or cats (Heusner AA 1991), and every equation only predicts a theoretical average for a specific group of animals"},
-    "C-BCS-06": {"src": "AAFP-NUTRITION-2018", "page": 3, "zh": "要經常看體態，再調整餵的量", "quote": "Therefore, veterinarians and clients need to monitor body condition frequently and adjust the amount fed appropriately"},
-    "C-TRT-01": {"src": "AAFP-NUTRITION-2018", "page": 2, "zh": "零食永遠不要超過總飲食的 10%，而且零食的熱量要算進每天的份量", "quote": "Treats should never amount to more than 10% of the total diet, and treat calories must be included when calculating daily food allowances"},
-    "C-TRT-03": {"src": "WSAVA-NUTRITION-2011", "page": 3, "zh": "點心、零食、餐桌食物超過總熱量的 10%，是營養評估裡的風險因子", "quote": "Snacks, treats, table food > 10% of total calories"},
-    "C-FEED-01": {"src": "AAFP-NUTRITION-2018", "page": 3, "zh": "每天的份量要分成多次小餐，在 24 小時內餵完，可以的話用益智餵食器", "quote": "The cat’s daily food allowance should be split into multiple small meals and fed throughout the 24 h period, using puzzle feeders when possible"},
-    "C-FEED-08": {"src": "DELGADO-2020-FEEDING-WELLBEING", "page": 4, "zh": "不管怎麼餵，都要用秤追蹤貓一天總共吃了多少", "quote": "owners should track the overall daily intake of their cat by weighing food with a scale"},
-    "C-KCAL-01": {"src": "WSAVA-SELECTING-PET-FOODS-2021", "page": 1, "zh": "只有美國規定標籤要寫熱量；沒寫的話可以問廠商，或用標籤上的成分算", "quote": "Calorie information is only required on pet food labels in the US. Where it is not provided on the label it should be available by contacting the manufacturer or calculating from label nutrient analysis"}
+  "WSAVA-CALORIE-CAT-2020": {
+   "short": "WSAVA 2020",
+   "name": "世界小動物獸醫協會（WSAVA）全球營養委員會",
+   "title": "Calorie Needs for an Average Healthy Adult Cat in Ideal Body Condition",
+   "year": 2020,
+   "url": "https://wsava.org/wp-content/uploads/2020/07/Calorie-Needs-for-Healthy-Adult-Cats-updated-July-2020.pdf"
+  },
+  "WSAVA-SELECTING-PET-FOODS-2021": {
+   "short": "WSAVA 2021",
+   "name": "世界小動物獸醫協會（WSAVA）全球營養委員會",
+   "title": "Guidelines on Selecting Pet Foods",
+   "year": 2021,
+   "url": "https://wsava.org/wp-content/uploads/2021/04/Selecting-a-pet-food-for-your-pet-updated-2021_WSAVA-Global-Nutrition-Toolkit.pdf"
+  },
+  "WSAVA-NUTRITION-2011": {
+   "short": "WSAVA 2011",
+   "name": "Freeman L, Becvarova I, Cave N, et al.",
+   "title": "WSAVA Nutritional Assessment Guidelines",
+   "year": 2011,
+   "url": "https://wsava.org/wp-content/uploads/2020/01/WSAVA-Nutrition-Assessment-Guidelines-2011-JSAP.pdf"
+  },
+  "AAHA-NUTRITION-2021": {
+   "short": "AAHA 2021",
+   "name": "美國動物醫院協會（AAHA）",
+   "title": "2021 AAHA Nutrition and Weight Management Guidelines for Dogs and Cats",
+   "year": 2021,
+   "url": "https://www.aaha.org/wp-content/uploads/globalassets/02-guidelines/2021-nutrition-and-weight-management/resourcepdfs/new-2021-aaha-nutrition-and-weight-management-guidelines-with-ref.pdf"
+  },
+  "AAFP-NUTRITION-2018": {
+   "short": "AAFP 2018",
+   "name": "美國貓科獸醫師協會（AAFP）",
+   "title": "Feline feeding programs: addressing behavioral needs to improve feline health and wellbeing",
+   "year": 2018,
+   "url": "https://catvets.com/resource/guidelines-practice-guidelines-how-to-feed-how-to-feed-a-cat-consensus-statement/"
+  },
+  "DELGADO-2020-FEEDING-WELLBEING": {
+   "short": "Delgado 2020",
+   "name": "Delgado M, Dantas LMS",
+   "title": "Feeding Cats for Optimal Mental and Behavioral Well-Being",
+   "year": 2020,
+   "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7415653/"
   }
+ },
+ "claims": {
+  "C-CALC-01": {
+   "src": "FEDIAF-NUTRITION-GUIDELINES-2025",
+   "page": 57,
+   "zh": "結紮或住室內的成貓，平均每日熱量需求是每公斤代謝體重（體重^0.67）52–75 大卡",
+   "quote": "Average daily energy requirements of adult cats Table VII-10. Average energy requirements during growth and reproduction in cats Gender - Activity kcal ME per kg BW0.67 kcal ME per kg BW (4 kg cat) kJ ME per kg BW0.67 kJ ME per kg BW (4 kg cat) Neutered and/or indoor cats 52 - 75"
+  },
+  "C-CALC-02": {
+   "src": "FEDIAF-NUTRITION-GUIDELINES-2025",
+   "page": 57,
+   "zh": "活動的成貓（Active cats），平均每日熱量需求是每公斤代謝體重 100 大卡",
+   "quote": "Active cats 100 60 - 65 418"
+  },
+  "C-KCAL-08": {
+   "src": "FEDIAF-NUTRITION-GUIDELINES-2025",
+   "page": 57,
+   "zh": "一般活動量的成貓用 100 × 體重^0.67 大卡；室內或結紮的成貓，平均估計是 75 × 體重^0.67 大卡",
+   "quote": "FEDIAF recommendations for normal active adult cats are in accordance with NRC (NRC 2006j) assuming a maintenance energy requirement of 100 kcal/kg BW0.67. For indoor and/or neutered adult cats the average maintenance energy requirement is estimated to be 75 kcal/kg BW0.67"
+  },
+  "C-CALC-03": {
+   "src": "FEDIAF-NUTRITION-GUIDELINES-2025",
+   "page": 57,
+   "zh": "幼貓的平均熱量需求寫成維持需求（MER）的倍數：未滿 4 個月 2.0–2.5 倍、4 到 9 個月 1.75–2.0 倍、9 到 12 個月 1.5 倍",
+   "quote": "Kittens Age Times MER Up to 4 months 2.0 - 2.5 4 to 9 months 1.75 - 2.0 9 to 12 months 1.5"
+  },
+  "C-KCAL-09": {
+   "src": "WSAVA-CALORIE-CAT-2020",
+   "page": 1,
+   "zh": "WSAVA 熱量表的範圍由 2006 年 NRC 的兩條公式算出：精瘦成貓 100 × 體重^0.67，容易胖的成貓 130 × 體重^0.4",
+   "quote": "Reference calculations used: 2006 NRC Daily Maintenance Energy Requirement for Cats. Lean Adult: 100 kcal x BWkg Obese-prone Adult: 130 kcal x BWkg0.4 0.67"
+  },
+  "C-KCAL-05": {
+   "src": "WSAVA-CALORIE-CAT-2020",
+   "page": 1,
+   "zh": "熱量表只是參考；每隻貓不一樣，有的要多吃、有的要少吃，才能維持理想、精瘦的體態",
+   "quote": "These recommendations are for guidance only. Cats are individuals and some may have higher or lower requirements in order to maintain an ideal, trim body condition"
+  },
+  "C-CALC-04": {
+   "src": "AAHA-NUTRITION-2021",
+   "page": 8,
+   "figure": true,
+   "zh": "靜止能量需求（RER）＝體重（公斤）^0.75 × 70",
+   "quote": "RER = BWkg0.75 × 70"
+  },
+  "C-CALC-05": {
+   "src": "AAHA-NUTRITION-2021",
+   "page": 8,
+   "figure": true,
+   "zh": "每日維持需求（MER）＝RER × 生命階段係數；貓減重的係數是 0.8",
+   "quote": "MER = RER × life stage factor … Weight loss 0.8"
+  },
+  "C-CALC-06": {
+   "src": "AAHA-NUTRITION-2021",
+   "page": 9,
+   "zh": "減重的熱量用理想體重來算，再依每隻貓目前吃的量和生活需要調整",
+   "quote": "Base these calculations on ideal weight and adjust as needed for the individual patient, based on current intake and lifestyle needs"
+  },
+  "C-KCAL-02": {
+   "src": "FEDIAF-NUTRITION-GUIDELINES-2025",
+   "page": 48,
+   "zh": "每隻貓需要的熱量差很多，即使生活條件一樣也是",
+   "quote": "Energy requirements vary considerably between individual dogs and cats, even between animals kept under the same conditions"
+  },
+  "C-KCAL-07": {
+   "src": "FEDIAF-NUTRITION-GUIDELINES-2025",
+   "page": 48,
+   "zh": "沒有一個公式能算出所有貓的熱量需求，公式只能預測一群貓的理論平均",
+   "quote": "No single formula will allow to calculate the energy requirements for all dogs or cats (Heusner AA 1991), and every equation only predicts a theoretical average for a specific group of animals"
+  },
+  "C-BCS-06": {
+   "src": "AAFP-NUTRITION-2018",
+   "page": 3,
+   "zh": "獸醫和飼主要經常看體態，再適當調整餵的量",
+   "quote": "Therefore, veterinarians and clients need to monitor body condition frequently and adjust the amount fed appropriately"
+  },
+  "C-TRT-01": {
+   "src": "AAFP-NUTRITION-2018",
+   "page": 2,
+   "zh": "零食永遠不要超過總飲食的 10%，而且零食的熱量要算進每天的份量",
+   "quote": "Treats should never amount to more than 10% of the total diet, and treat calories must be included when calculating daily food allowances"
+  },
+  "C-TRT-03": {
+   "src": "WSAVA-NUTRITION-2011",
+   "page": 3,
+   "zh": "點心、零食、餐桌食物超過總熱量的 10%，是營養評估裡的風險因子",
+   "quote": "Snacks, treats, table food > 10% of total calories"
+  },
+  "C-FEED-01": {
+   "src": "AAFP-NUTRITION-2018",
+   "page": 3,
+   "zh": "每天的份量要分成多次小餐，在 24 小時內餵完，可以的話用益智餵食器",
+   "quote": "The cat’s daily food allowance should be split into multiple small meals and fed throughout the 24 h period, using puzzle feeders when possible"
+  },
+  "C-FEED-08": {
+   "src": "DELGADO-2020-FEEDING-WELLBEING",
+   "page": 4,
+   "zh": "讓貓自由取食或用多種方式餵（益智餵食器、分餐），都要用秤追蹤貓一天總共吃了多少",
+   "quote": "Owners can allow cats to graze or offer multiple feeding choices (food puzzles, as well as meals). In either case, owners should track the overall daily intake of their cat by weighing food with a scale"
+  },
+  "C-KCAL-01": {
+   "src": "WSAVA-SELECTING-PET-FOODS-2021",
+   "page": 1,
+   "zh": "只有美國規定標籤要寫熱量；沒寫的話可以問廠商，或用標籤上的營養分析值算",
+   "quote": "Calorie information is only required on pet food labels in the US. Where it is not provided on the label it should be available by contacting the manufacturer or calculating from label nutrient analysis"
+  },
+  "C-CALC-07": {
+   "src": "WSAVA-CALORIE-CAT-2020",
+   "page": 1,
+   "zh": "WSAVA 熱量表的對象是理想體態、一般健康的成貓",
+   "quote": "Calorie Needs for an Average Healthy Adult Cat in Ideal Body Condition"
+  },
+  "C-CALC-08": {
+   "src": "WSAVA-CALORIE-CAT-2020",
+   "page": 1,
+   "zh": "WSAVA 熱量表從 1.0 公斤列起",
+   "quote": "Weight (kg) Weight (lb) Kilocalories/day 1.0 2.2 100-130"
+  },
+  "C-CALC-09": {
+   "src": "WSAVA-CALORIE-CAT-2020",
+   "page": 1,
+   "zh": "WSAVA 熱量表列到 7.0 公斤為止",
+   "quote": "7.0 15.4 280-370 Updated July 2020"
+  },
+  "C-CALC-10": {
+   "src": "AAFP-NUTRITION-2018",
+   "page": 3,
+   "zh": "大多數家貓結紮，活動量也少",
+   "quote": "Most house cats are neutered and minimally active"
+  },
+  "C-CALC-11": {
+   "src": "AAHA-NUTRITION-2021",
+   "page": 8,
+   "figure": true,
+   "zh": "這些係數只是估算熱量的一般原則；不太活動或住室內的可能需要更少；熱量要看體重和體態評分來調整",
+   "quote": "The above life stage factors are general guidelines for estimating caloric intake. Sedentary and/or indoor pets may require less caloric intake than indicated above. Adjustment of caloric intake should be done by monitoring BW and BCS."
+  }
+ }
 }
 </script>
 
@@ -221,7 +385,7 @@ const Calc = (() => {
     const rows = [];
     if (stage === "kitten") {
       const m = Number(ageMonths);
-      if (ageMonths === "" || ageMonths == null || !(m >= 0)) return { ok: false, need: "age" };
+      if (ageMonths == null || String(ageMonths).trim() === "" || !(m >= 0)) return { ok: false, need: "age" };
       const band = KITTEN_BANDS.find((b) => m < b.maxMonths);
       if (!band) return { ok: false, need: "adult" };
       // 基準：FEDIAF 一般活動量成貓的維持需求 100 × 體重^0.67〔C-KCAL-08〕
@@ -231,7 +395,7 @@ const Calc = (() => {
       else rows.push({ key: "fediaf-indoor", low: r0(52 * mw), high: r0(75 * mw) });                            // 〔C-CALC-01〕
       const a = 100 * mw, b = 130 * Math.pow(w, 0.4);                                                          // 〔C-KCAL-09〕
       rows.push({ key: "wsava", low: r0(Math.min(a, b)), high: r0(Math.max(a, b)) });
-      if (targetKg !== undefined && targetKg !== "" && targetKg !== null) {
+      if (targetKg != null && String(targetKg).trim() !== "") {
         const t = Number(targetKg);
         if (!(t >= 0.5 && t < w)) return { ok: false, need: "target", rows, w, mw };
         const rer = 70 * Math.pow(t, 0.75);                                                                    // 〔C-CALC-04〕
@@ -295,7 +459,9 @@ if (typeof module !== "undefined") module.exports = Calc;
   const form = $("form");
   const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
   const fmt = (n, d = 0) => (n == null ? "—" : Number(n).toLocaleString("zh-TW", { minimumFractionDigits: d, maximumFractionDigits: d }));
+  const fmtW = (n) => Number(n).toLocaleString("zh-TW", { maximumFractionDigits: 2 });   // 體重照輸入顯示，不另外四捨五入
   const range = (lo, hi, d = 0, unit = "") => (lo === hi ? `${fmt(lo, d)}${unit}` : `${fmt(lo, d)}–${fmt(hi, d)}${unit}`);
+  const chip = (id) => `<button type="button" class="cid" data-c="${id}">${id}</button>`;
 
   function claimHTML(id) {
     const c = DATA.claims[id], s = DATA.sources[c.src];
@@ -303,26 +469,31 @@ if (typeof module !== "undefined") module.exports = Calc;
     return `<div class="claim"><span class="cid">${id}</span> ${esc(c.zh)}<q>“${esc(c.quote)}”</q><span class="src">${esc(s.short)}，${page}</span></div>`;
   }
 
+  const MW = (e) => `代謝體重（metabolic body weight）= ${fmtW(e.w)}^0.67 = ${fmt(e.mw, 2)}`;
   const ROWS = {
-    "fediaf-indoor": { name: "FEDIAF：結紮或室內的成貓", claims: ["C-CALC-01", "C-KCAL-08"],
-      how: (e, r) => [`代謝體重 = ${fmt(e.w, 1)}^0.67 = ${fmt(e.mw, 2)}`, `52 × ${fmt(e.mw, 2)} = ${r.low} 大卡`, `75 × ${fmt(e.mw, 2)} = ${r.high} 大卡`] },
-    "fediaf-active": { name: "FEDIAF：活動量大的成貓", claims: ["C-CALC-02", "C-KCAL-08"],
-      how: (e, r) => [`代謝體重 = ${fmt(e.w, 1)}^0.67 = ${fmt(e.mw, 2)}`, `100 × ${fmt(e.mw, 2)} = ${r.low} 大卡`] },
+    "fediaf-indoor": { name: "FEDIAF：結紮或住室內的成貓", claims: ["C-CALC-01"],
+      how: (e, r) => [MW(e), `52 × ${fmt(e.mw, 2)} = ${r.low} 大卡`, `75 × ${fmt(e.mw, 2)} = ${r.high} 大卡`] },
+    "fediaf-active": { name: "FEDIAF：沒結紮、一般活動量的成貓", claims: ["C-CALC-02", "C-KCAL-08"],
+      how: (e, r) => [MW(e), `100 × ${fmt(e.mw, 2)} = ${r.low} 大卡`] },
     "fediaf-kitten": { name: "FEDIAF：幼貓", claims: ["C-CALC-03", "C-KCAL-08"],
-      how: (e, r) => [`代謝體重 = ${fmt(e.w, 1)}^0.67 = ${fmt(e.mw, 2)}`, `成貓維持需求 = 100 × ${fmt(e.mw, 2)} = ${fmt(100 * e.mw)} 大卡`,
-        `${fmt(r.months, 1)} 個月的倍數是 ${range(r.times[0], r.times[1], 2)} 倍 → ${range(r.low, r.high)} 大卡`] },
-    "wsava": { name: "WSAVA：理想體態的成貓", claims: ["C-KCAL-09", "C-KCAL-05"],
-      how: (e, r) => [`100 × ${fmt(e.w, 1)}^0.67 = ${fmt(100 * e.mw)} 大卡`, `130 × ${fmt(e.w, 1)}^0.4 = ${fmt(130 * Math.pow(e.w, 0.4))} 大卡`, `兩個數字之間：${range(r.low, r.high)} 大卡`] },
-    "aaha-loss": { name: "AAHA：減重", tag: "用目標體重算", claims: ["C-CALC-04", "C-CALC-05", "C-CALC-06"],
-      how: (e, r) => [`RER = ${fmt(r.targetKg, 1)}^0.75 × 70 = ${r.rer} 大卡`, `× 減重係數 0.8 = ${r.low} 大卡`] },
+      how: (e, r) => [MW(e),
+        `原表只寫「維持需求的倍數」，沒有指定用哪一種維持需求當基準；這裡取 FEDIAF 一般活動量成貓的 100 × 體重^0.67 = ${fmt(100 * e.mw)} 大卡（這是本工具的假設）`,
+        `${fmtW(r.months)} 個月的倍數是 ${range(r.times[0], r.times[1], 2)} 倍 → ${range(r.low, r.high)} 大卡`] },
+    "wsava": { name: "WSAVA：理想體態的成貓", claims: ["C-KCAL-09", "C-CALC-07"],
+      how: (e, r) => [`100 × ${fmtW(e.w)}^0.67 = ${fmt(100 * e.mw)} 大卡`, `130 × ${fmtW(e.w)}^0.4 = ${fmt(130 * Math.pow(e.w, 0.4))} 大卡`, `兩個數字之間：${range(r.low, r.high)} 大卡`] },
+    "aaha-loss": { name: "AAHA：減重", tag: "用理想體重算", claims: ["C-CALC-04", "C-CALC-05", "C-CALC-11", "C-CALC-06"],
+      how: (e, r) => [`靜止能量需求（resting energy requirement, RER）= ${fmtW(r.targetKg)}^0.75 × 70 = ${r.rer} 大卡`, `× 減重係數 0.8 = ${r.low} 大卡`] },
   };
 
   const NEED = {
     weight: "體重請填 0.5 到 15 公斤。",
     age: "請填幼貓的月齡。",
     adult: "12 個月以上，請改選「成貓」。",
-    target: "目標體重要比目前體重輕（0.5 公斤以上）。",
+    target: "理想體重要小於目前體重，而且至少 0.5 公斤。",
+    targetEmpty: "請填獸醫建議的理想體重。",
   };
+  // 單位檢查用的寬鬆範圍（不是營養建議，只用來發現單位選錯）
+  const SANE = { dry: [150, 800], wet: [30, 300], can: [10, 500] };
 
   function read() {
     const f = new FormData(form);
@@ -338,8 +509,9 @@ if (typeof module !== "undefined") module.exports = Calc;
   function portionHTML(p, meals) {
     const cells = [];
     const perMeal = (lo, hi) => `<span>每餐約 ${range(Math.round(lo / meals), Math.round(hi / meals), 0, " 克")}</span>`;
+    const r1 = (x) => Math.round((x / meals) * 10) / 10;
     if (p.lo.dryG != null) cells.push(`<div class="portion"><span>乾糧</span><b>${range(p.lo.dryG, p.hi.dryG, 0, " 克")}</b>${perMeal(p.lo.dryG, p.hi.dryG)}</div>`);
-    if (p.lo.cans != null) cells.push(`<div class="portion"><span>罐頭</span><b>${range(p.lo.cans, p.hi.cans, 1, " 罐")}</b>${p.lo.wetG != null ? `<span>約 ${range(p.lo.wetG, p.hi.wetG, 0, " 克")}</span>` : ""}</div>`);
+    if (p.lo.cans != null) cells.push(`<div class="portion"><span>罐頭</span><b>${range(p.lo.cans, p.hi.cans, 1, " 罐")}</b><span>每餐約 ${range(r1(p.lo.cans), r1(p.hi.cans), 1, " 罐")}${p.lo.wetG != null ? `（${range(Math.round(p.lo.wetG / meals), Math.round(p.hi.wetG / meals), 0, " 克")}）` : ""}</span></div>`);
     else if (p.lo.wetG != null) cells.push(`<div class="portion"><span>罐頭</span><b>${range(p.lo.wetG, p.hi.wetG, 0, " 克")}</b>${perMeal(p.lo.wetG, p.hi.wetG)}</div>`);
     if (p.lo.treatKcal) cells.push(`<div class="portion"><span>零食最多</span><b>${range(p.lo.treatKcal, p.hi.treatKcal, 0, " 大卡")}</b></div>`);
     return cells.length ? `<div class="portions">${cells.join("")}</div>` : "";
@@ -351,48 +523,63 @@ if (typeof module !== "undefined") module.exports = Calc;
     $("kittenBox").hidden = s.stage !== "kitten";
     $("loseBox").hidden = !s.lose;
     $("cgBox").hidden = s.wu === "can";
-    const dryPer100 = Calc.per100g(s.dk, s.du);
-    const wetPer100 = s.wu === "can" ? null : Calc.per100g(s.wk, s.wu);
-    const wetPerCan = s.wu === "can" ? (Number(s.wk) > 0 ? Number(s.wk) : null)
+    const out = [];
+    const inRange = (v, [a, b]) => v == null || (v >= a && v <= b);
+    let dryPer100 = Calc.per100g(s.dk, s.du);
+    let wetPer100 = s.wu === "can" ? null : Calc.per100g(s.wk, s.wu);
+    let wetPerCan = s.wu === "can" ? (Number(s.wk) > 0 ? Number(s.wk) : null)
       : (wetPer100 && Number(s.cg) > 0 ? (wetPer100 * Number(s.cg)) / 100 : null);
+    if (!inRange(dryPer100, SANE.dry)) {
+      out.push(`<p class="msg">乾糧換算成每 100 克 ${fmt(dryPer100, 1)} 大卡，和一般乾糧差很多。單位是不是選錯了？請對照包裝。</p>`);
+      dryPer100 = null;
+    }
+    if (!inRange(wetPer100, SANE.wet) || (s.wu === "can" && !inRange(wetPerCan, SANE.can))) {
+      out.push(`<p class="msg">罐頭的熱量看起來不太對（${s.wu === "can" ? `每罐 ${fmt(wetPerCan)} 大卡` : `每 100 克 ${fmt(wetPer100, 1)} 大卡`}），單位是不是選錯了？請對照包裝。</p>`);
+      wetPer100 = wetPerCan = null;
+    }
     const hasDry = !!dryPer100, hasWet = !!(wetPer100 || wetPerCan);
     $("mixBox").hidden = !(hasDry && hasWet);
     $("mixOut").textContent = s.mix;
 
-    const e = Calc.energy({
-      weightKg: s.w, stage: s.stage, activity: s.act, ageMonths: s.age,
-      targetKg: s.stage === "adult" && s.lose ? s.target : undefined,
-    });
-    const out = [];
+    const loss = s.stage === "adult" && s.lose;
+    const e = Calc.energy({ weightKg: s.w, stage: s.stage, activity: s.act, ageMonths: s.age, targetKg: loss ? s.target : undefined });
     if (!e.ok) out.push(`<p class="msg">${NEED[e.need]}</p>`);
-    const rows = e.rows || [];
-    if (!hasDry && !hasWet && rows.length) out.push(`<p class="msg">填上包裝的熱量，就能換成克數或罐數。</p>`);
+    else if (loss && !s.target) out.push(`<p class="msg">${NEED.targetEmpty}</p>`);
+    let rows = e.ok ? e.rows : [];
+    const lossRow = rows.find((r) => r.key === "aaha-loss");
+    if (loss) rows = lossRow ? [lossRow] : [];   // 減重時只列減重量；維持量用目前體重算，不列出，免得被當成減重的份量
+    if (!s.dk && !s.wk && rows.length) out.push(`<p class="msg">填上包裝的熱量，就能換成克數或罐數。</p>`);
     const food = { dryPer100, wetPer100, wetPerCan, wetShare: Number(s.mix) / 100, treat: s.treat };
     const meals = Number(s.meals) || 3;
-    const ordered = [...rows].sort((a, b) => (b.key === "aaha-loss") - (a.key === "aaha-loss"));
-    for (const r of ordered) {
+    for (const r of rows) {
       const def = ROWS[r.key];
+      const claims = [...def.claims];
       const p = { lo: Calc.portion(r.low, food), hi: Calc.portion(r.high, food) };
       const hows = def.how(e, r);
-      if (s.treat) hows.push(`留 10% 給零食：主食 ${range(p.lo.foodKcal, p.hi.foodKcal)} 大卡`);
+      let note = "";
+      if (r.key === "wsava" && (e.w < 1 || e.w > 7)) {
+        note = `<p class="hint">WSAVA 熱量表列的是 1.0 到 7.0 公斤${chip("C-CALC-08")}${chip("C-CALC-09")}；這個體重在表外，數字是用同一組公式往外算的。</p>`;
+        claims.push("C-CALC-08", "C-CALC-09");
+      }
+      if (s.treat) hows.push(`主食扣掉 10% 當零食上限：主食 ${range(p.lo.foodKcal, p.hi.foodKcal)} 大卡`);
       if (p.lo.dryKcal != null && p.lo.wetKcal != null) hows.push(`罐頭 ${s.mix}%：罐頭 ${range(p.lo.wetKcal, p.hi.wetKcal)} 大卡、乾糧 ${range(p.lo.dryKcal, p.hi.dryKcal)} 大卡`);
       if (p.lo.dryG != null) hows.push(`乾糧：大卡 ÷ ${fmt(dryPer100, 1)}（每 100 克）× 100`);
       if (p.lo.cans != null) hows.push(`罐頭：大卡 ÷ ${fmt(wetPerCan, 1)}（每罐）`);
       else if (p.lo.wetG != null) hows.push(`罐頭：大卡 ÷ ${fmt(wetPer100, 1)}（每 100 克）× 100`);
       out.push(`<div class="res"><h3>${def.name}${def.tag ? `<span class="tag">${def.tag}</span>` : ""}</h3>
         <div class="big">${range(r.low, r.high, 0, " 大卡")}<small style="font-size:16px;font-weight:500;color:var(--text-muted)">／天</small></div>
-        ${portionHTML(p, meals)}
-        <details><summary>怎麼算的</summary><div class="how"><ol>${hows.map((h) => `<li>${h}</li>`).join("")}</ol>${def.claims.map(claimHTML).join("")}</div></details></div>`);
-      if (r.key === "aaha-loss") out.push(`<p class="msg">減重的熱量用理想體重來算<span class="cid">C-CALC-06</span>。下面是用目前體重算的維持量，只供對照。</p>`);
+        ${note}${portionHTML(p, meals)}
+        <details><summary>怎麼算的</summary><div class="how"><ol>${hows.map((h) => `<li>${h}</li>`).join("")}</ol>${claims.map(claimHTML).join("")}</div></details></div>`);
     }
-    const first = ordered[0];
-    $("barText").textContent = first ? `每天 ${range(first.low, first.high)} 大卡（${ROWS[first.key].name.split("：")[0]}）` : "填好資料就會算出結果";
-    if (rows.length > 1 && e.ok) out.push(`<p class="hint">幾種算法並列，是因為不同指引用的公式不同。先從範圍裡選一個量開始，再看體態調整。</p>`);
+    if (lossRow) out.push(`<p class="hint">減重的熱量用理想體重來算${chip("C-CALC-06")}；WSAVA 熱量表的對象是理想體態的成貓${chip("C-CALC-07")}。勾了減重時，這裡不列用目前體重算的維持量。</p>`);
+    else if (rows.length > 1) out.push(`<p class="hint">各指引的公式不同（FEDIAF${chip("C-CALC-01")}、WSAVA${chip("C-KCAL-09")}），這裡並列。獸醫和飼主要經常看體態，再調整餵的量${chip("C-BCS-06")}。</p>`);
     $("out").innerHTML = out.join("");
+    const first = rows[0];
+    $("barText").textContent = first ? `每天 ${range(first.low, first.high)} 大卡（${ROWS[first.key].name.split("：")[0]}）` : "填好資料就會算出結果";
     writeURL(s);
   }
 
-  // ---- 網址參數：同一組設定可以分享 ----
+  // ---- 網址參數：同一組設定可以分享；讀進來時只接受允許的值 ----
   const KEYS = ["w", "stage", "act", "lose", "target", "age", "dk", "du", "wk", "wu", "cg", "mix", "treat", "meals"];
   function writeURL(s) {
     const q = new URLSearchParams();
@@ -405,30 +592,42 @@ if (typeof module !== "undefined") module.exports = Calc;
   }
   function readURL() {
     const q = new URLSearchParams(location.search);
-    if (![...q.keys()].length) return;
     for (const k of KEYS) {
       if (!q.has(k)) continue;
       const v = q.get(k);
       const el = form.elements[k];
       if (!el) continue;
-      if (el instanceof RadioNodeList) { for (const r of el) r.checked = r.value === v; }
-      else if (el.type === "checkbox") el.checked = v === "1";
-      else el.value = v;
+      if (el instanceof RadioNodeList) {
+        if ([...el].some((r) => r.value === v)) for (const r of el) r.checked = r.value === v;
+      } else if (el.type === "checkbox") el.checked = v === "1";
+      else if (el.tagName === "SELECT") { if ([...el.options].some((o) => o.value === v)) el.value = v; }
+      else if (v === "" || isFinite(Number(v))) el.value = v;
     }
   }
 
   function staticParts() {
     $("why").innerHTML = [
-      ["每隻貓需要的熱量差很多，公式只能預測一群貓的平均。", ["C-KCAL-02", "C-KCAL-07"]],
-      ["熱量表只是參考，以維持理想體態為準。", ["C-KCAL-05"]],
-      ["所以要經常看體態，再調整餵的量。", ["C-BCS-06"]],
-      ["用秤量，追蹤貓一天總共吃了多少。", ["C-FEED-08"]],
+      ["每隻貓需要的熱量差很多；沒有一個公式能算出所有貓的需求，公式只能預測一群貓的平均。", ["C-KCAL-02", "C-KCAL-07"]],
+      ["熱量表只是參考；有的貓要多吃、有的要少吃，才能維持理想體態。", ["C-KCAL-05"]],
+      ["係數只是估算熱量的一般原則，不太活動或住室內的貓可能需要更少。", ["C-CALC-11"]],
+      ["獸醫和飼主要經常看體態，再調整餵的量。", ["C-BCS-06"]],
+      ["不管是讓貓自由取食還是分餐，都用秤追蹤一天總共吃了多少。", ["C-FEED-08"]],
       ["零食的熱量要算進每天的份量，而且不超過 10%。", ["C-TRT-01", "C-TRT-03"]],
       ["每天的份量分成多次小餐。", ["C-FEED-01"]],
-    ].map(([t, ids]) => `<li>${t} ${ids.map((i) => `<span class="cid">${i}</span>`).join(" ")}<details><summary>原文</summary><div class="how">${ids.map(claimHTML).join("")}</div></details></li>`).join("");
+    ].map(([t, ids]) => `<li>${t} ${ids.map(chip).join("")}</li>`).join("");
     $("sources").innerHTML = Object.values(DATA.sources).map((s) =>
       `<li><b>${esc(s.short)}</b>　${esc(s.name)}（${s.year}）. <a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.title)}</a></li>`).join("");
   }
+
+  // 點綠色編號：顯示那一條的中文、英文原句和頁碼
+  document.addEventListener("click", (ev) => {
+    const b = ev.target.closest("button.cid");
+    if (!b) return;
+    ev.preventDefault();
+    const c = DATA.claims[b.dataset.c], s = DATA.sources[c.src];
+    $("dlgBody").innerHTML = claimHTML(b.dataset.c) + `<p class="hint"><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.title)}</a>（${s.year}）</p>`;
+    $("dlg").showModal();
+  });
 
   $("copy").addEventListener("click", async () => {
     try { await navigator.clipboard.writeText(location.href); $("copy").textContent = "已複製連結"; }

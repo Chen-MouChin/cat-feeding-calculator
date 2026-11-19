@@ -55,6 +55,7 @@ t("幼貓月齡分段的邊界：4、9、12 個月", () => {
   assert.deepEqual(times(9), [1.5, 1.5]);
   assert.equal(Calc.energy({ weightKg: 3, stage: "kitten", ageMonths: 12 }).need, "adult");
   assert.equal(Calc.energy({ weightKg: 3, stage: "kitten", ageMonths: "" }).need, "age");
+  assert.equal(Calc.energy({ weightKg: 3, stage: "kitten", ageMonths: "  " }).need, "age");   // 審查 #28：空白不當成 0 個月
 });
 
 t("活動量大：FEDIAF 100 × 體重^0.67，上下限相同", () => {
@@ -70,6 +71,7 @@ t("輸入檢查：體重範圍、目標體重要比目前輕", () => {
   assert.equal(Calc.energy({ weightKg: 4, targetKg: 4 }).need, "target");
   assert.equal(Calc.energy({ weightKg: 4, targetKg: 5 }).need, "target");
   assert.equal(Calc.energy({ weightKg: 4, targetKg: "" }).ok, true);   // 沒填目標就不算減重
+  assert.equal(Calc.energy({ weightKg: 4, targetKg: " " }).rows.length, 2);
 });
 
 t("單位換算：每公斤 ÷ 10 = 每 100 克", () => {

@@ -107,11 +107,14 @@ footer.fc-foot{margin-top:28px;color:var(--text-muted);font-size:14px;border-top
         </div>
         <p class="hint" id="actHint">大多數家貓結紮，活動量也少<button type="button" class="cid" data-c="C-CALC-10">C-CALC-10</button>。</p>
         <p class="hint" id="actLossHint" hidden>減重時用理想體重算，不使用活動量。</p>
-        <label class="check" style="margin-top:12px"><input type="checkbox" id="lose" name="lose"><span>獸醫建議減重</span></label>
+        <label class="check" style="margin-top:12px"><input type="checkbox" id="lose" name="lose"><span>需要減重</span></label>
         <div class="sub" id="loseBox" hidden>
-          <label class="lbl" for="target">理想體重</label>
-          <div class="row"><input id="target" name="target" type="number" inputmode="decimal" min="0.5" max="15" step="0.1"><span class="unit">公斤</span></div>
-          <p class="hint">理想體重請和獸醫討論，這裡不幫你推算。</p>
+          <label class="lbl" for="bcs">現在的體態評分（9 分制）</label>
+          <select id="bcs" name="bcs"><option value="">不知道</option><option value="6">6 分：略胖</option><option value="7">7 分：過重</option><option value="8">8 分：肥胖</option><option value="9">9 分：嚴重肥胖</option></select>
+          <p class="hint" id="idealHint" hidden></p>
+          <label class="lbl" for="target" style="margin-top:10px">理想體重</label>
+          <div class="row"><input id="target" name="target" type="number" inputmode="decimal" min="0.5" max="15" step="0.1"><span class="unit">公斤</span>
+            <button type="button" class="copy" id="useIdeal" hidden style="margin-top:0"></button></div>
         </div>
       </fieldset>
 
@@ -365,6 +368,30 @@ footer.fc-foot{margin-top:28px;color:var(--text-muted);font-size:14px;border-top
    "figure": true,
    "zh": "這些係數只是估算熱量的一般原則；不太活動或住室內的可能需要更少；熱量要看體重和體態評分來調整",
    "quote": "The above life stage factors are general guidelines for estimating caloric intake. Sedentary and/or indoor pets may require less caloric intake than indicated above. Adjustment of caloric intake should be done by monitoring BW and BCS."
+  },
+  "C-CALC-12": {
+   "src": "AAHA-NUTRITION-2021",
+   "page": 3,
+   "zh": "9 分制體態評分超過 5 分後，每多一分大約等於超重 10%（每增加一分，體脂大約多 5%）",
+   "quote": "Every incremental increase in BCS is equivalent to a 5% increase in BF% while each BCS … 5/9 is equivalent to being 10% overweight"
+  },
+  "C-CALC-13": {
+   "src": "WSAVA-NUTRITION-2011",
+   "page": 3,
+   "zh": "大多數寵物的目標是 9 分制的 4–5 分；有些飼主會覺得這樣「太瘦」",
+   "quote": "The goal for most pets is a BCS of 4 to 5 of 9. (This may appear ‘too thin’ to some pet owners so client education is important.)"
+  },
+  "C-CALC-14": {
+   "src": "FEDIAF-NUTRITION-GUIDELINES-2025",
+   "page": 45,
+   "zh": "FEDIAF 的 9 分制體態表：6 分（略胖）約超重 10–15%、7 分（過重）20–30%、8 分（肥胖）30–40%、9 分（嚴重肥胖）超過 40%",
+   "quote": "6. Slightly overweight … +10 - 15% 7. Overweight … +20 - 30% 8. Obese … +30 - 40% 9. Grossly Obese … +>40%"
+  },
+  "C-CALC-15": {
+   "src": "FEDIAF-NUTRITION-GUIDELINES-2025",
+   "page": 45,
+   "zh": "數據顯示，結紮、不太活動的貓，最適合的可能是 4 分，而不是較活躍的未結紮貓最適合的 5 分",
+   "quote": "Data suggest that for neutered inactive cats a BCS of 4/9 may be optimal rather than the 5/9 score which is optimal for intact more active cats"
   }
  }
 }
@@ -452,7 +479,21 @@ const Calc = (() => {
     };
   }
 
-  return { energy, per100g, grams, cans, portion, KITTEN_BANDS };
+  /**
+   * 依體態評分估計理想體重的大致範圍（公斤，取到小數第一位）。
+   * FEDIAF 體態表〔C-CALC-14〕：6 分超重 10–15%、7 分 20–30%、8 分 30–40%、9 分超過 40%（沒有上限）。
+   * 理想體重 = 現在體重 ÷ (1 + 超重比例)；比例大的那一端得到範圍下限。AAHA「每多一分約超重 10%」〔C-CALC-12〕方向一致。
+   */
+  const OVER = { 6: [0.10, 0.15], 7: [0.20, 0.30], 8: [0.30, 0.40], 9: [0.40, null] };
+  function idealWeight(weightKg, bcs) {
+    const w = Number(weightKg), b = Number(bcs);
+    if (!(w >= 0.5 && w <= 15) || !OVER[b]) return null;
+    const [lo, hi] = OVER[b];
+    const r1 = (x) => Math.round(x * 10) / 10;
+    return { over: OVER[b], high: r1(w / (1 + lo)), low: hi == null ? null : r1(w / (1 + hi)) };
+  }
+
+  return { energy, per100g, grams, cans, portion, idealWeight, KITTEN_BANDS };
 })();
 if (typeof module !== "undefined") module.exports = Calc;
 </script>
@@ -495,7 +536,7 @@ if (typeof module !== "undefined") module.exports = Calc;
     age: "請填幼貓的月齡。",
     adult: "12 個月以上，請改選「成貓」。",
     target: "理想體重要小於目前體重，而且至少 0.5 公斤。",
-    targetEmpty: "請填獸醫建議的理想體重。",
+    targetEmpty: "請填理想體重；選了現在的體態評分，可以用估計的範圍。",
   };
   // 單位檢查用的寬鬆範圍（不是營養建議，只用來發現單位選錯）
   const SANE = { dry: [150, 800], wet: [20, 300], can: [10, 800] };
@@ -505,7 +546,7 @@ if (typeof module !== "undefined") module.exports = Calc;
     const get = (k) => (f.get(k) ?? "").toString().trim();
     return {
       w: get("w"), stage: get("stage") || "adult", act: get("act") || "indoor",
-      lose: $("lose").checked, target: get("target"), age: get("age"),
+      lose: $("lose").checked, bcs: get("bcs"), target: get("target"), age: get("age"),
       dk: get("dk"), du: get("du"), wk: get("wk"), wu: get("wu"), cg: get("cg"),
       mix: get("mix"), treat: $("treat").checked, meals: get("meals"),
     };
@@ -527,6 +568,16 @@ if (typeof module !== "undefined") module.exports = Calc;
     $("adultBox").hidden = s.stage !== "adult";
     $("kittenBox").hidden = s.stage !== "kitten";
     $("loseBox").hidden = !s.lose;
+    const iw = Calc.idealWeight(s.w, s.bcs);
+    $("idealHint").hidden = !iw;
+    $("useIdeal").hidden = !iw || !(iw.high < Number(s.w));
+    if (iw) {
+      const pct = iw.over[1] == null ? `超過 ${iw.over[0] * 100}%` : `約 ${iw.over[0] * 100}–${iw.over[1] * 100}%`;
+      const rng = iw.low == null ? `${fmt(iw.high, 1)} 公斤以下（9 分沒有上限，實際可能更低）` : `${fmt(iw.low, 1)}–${fmt(iw.high, 1)} 公斤`;
+      $("idealHint").innerHTML = `依 FEDIAF 的體態表，${s.bcs} 分超重${pct}${chip("C-CALC-14")}，理想體重大約 <b>${rng}</b>。結紮、不太活動的貓，4 分可能比 5 分更適合${chip("C-CALC-15")}；飼主常會覺得理想體態「太瘦」${chip("C-CALC-13")}，自己評的分數不一定準。`;
+      $("useIdeal").textContent = `填入範圍上限 ${fmt(iw.high, 1)} 公斤`;
+      $("useIdeal").dataset.v = iw.high;
+    }
     $("cgBox").hidden = s.wu === "can";
     const out = [];
     const inRange = (v, [a, b]) => v == null || (v >= a && v <= b);
@@ -583,7 +634,7 @@ if (typeof module !== "undefined") module.exports = Calc;
         <details${location.hash === "#how" ? " open" : ""}><summary>怎麼算的</summary><div class="how"><ol>${hows.map((h) => `<li>${h}</li>`).join("")}</ol>${claims.map(claimHTML).join("")}</div></details></div>`);
     }
     if (lossRow) out.push(`<p class="hint">減重的熱量用理想體重來算${chip("C-CALC-06")}；WSAVA 熱量表的對象是理想體態的成貓${chip("C-CALC-07")}。勾了減重時，這裡不列用目前體重算的維持量。</p>`);
-    else if (rows.length > 1) out.push(`<p class="hint">各指引的公式不同（FEDIAF${chip(rows[0].key === "fediaf-active" ? "C-CALC-02" : "C-CALC-01")}、WSAVA${chip("C-KCAL-09")}），這裡並列。獸醫和飼主要經常看體態，再調整餵的量${chip("C-BCS-06")}。</p>`);
+    else if (rows.length > 1) out.push(`<p class="hint">各指引的公式不同（FEDIAF${chip(rows[0].key === "fediaf-active" ? "C-CALC-02" : "C-CALC-01")}、WSAVA${chip("C-KCAL-09")}），這裡並列。要經常看體態，再調整餵的量${chip("C-BCS-06")}。</p>`);
     $("out").innerHTML = out.join("");
     const first = rows[0];
     $("barText").textContent = first ? `每天 ${range(first.low, first.high)} 大卡（${ROWS[first.key].name.split("：")[0]}）` : "填好資料就會算出結果";
@@ -591,11 +642,12 @@ if (typeof module !== "undefined") module.exports = Calc;
   }
 
   // ---- 網址參數：同一組設定可以分享；讀進來時只接受允許的值 ----
-  const KEYS = ["w", "stage", "act", "lose", "target", "age", "dk", "du", "wk", "wu", "cg", "mix", "treat", "meals"];
+  const KEYS = ["w", "stage", "act", "lose", "bcs", "target", "age", "dk", "du", "wk", "wu", "cg", "mix", "treat", "meals"];
   function writeURL(s) {
     const q = new URLSearchParams();
     for (const k of KEYS) {
       const v = s[k];
+      if (k === "bcs" && !s.lose) continue;
       if (v === true) q.set(k, "1");
       else if (v !== false && v !== "") q.set(k, v);
     }
@@ -621,7 +673,7 @@ if (typeof module !== "undefined") module.exports = Calc;
       ["每隻貓需要的熱量差很多；沒有一個公式能算出所有貓的需求，公式只能預測一群貓的平均。", ["C-KCAL-02", "C-KCAL-07"]],
       ["熱量表只是參考；有的貓要多吃、有的要少吃，才能維持理想體態。", ["C-KCAL-05"]],
       ["AAHA 的生命階段係數只是估算熱量的一般原則，不太活動或住室內的可能需要更少。", ["C-CALC-11"]],
-      ["獸醫和飼主要經常看體態，再調整餵的量。", ["C-BCS-06"]],
+      ["要經常看體態，再調整餵的量。", ["C-BCS-06"]],
       ["不管是讓貓自由取食還是分餐，都用秤追蹤一天總共吃了多少。", ["C-FEED-08"]],
       ["零食的熱量要算進每天的份量，而且不超過 10%。", ["C-TRT-01", "C-TRT-03"]],
       ["每天的份量分成多次小餐。", ["C-FEED-01"]],
@@ -640,6 +692,8 @@ if (typeof module !== "undefined") module.exports = Calc;
     $("dlg").showModal();
   });
   $("dlg").addEventListener("click", (ev) => { if (ev.target === $("dlg")) $("dlg").close(); });   // 點對話框外面也能關
+
+  $("useIdeal").addEventListener("click", () => { $("target").value = $("useIdeal").dataset.v; render(); $("target").focus(); });
 
   $("copy").addEventListener("click", async () => {
     try { await navigator.clipboard.writeText(location.href); $("copy").textContent = "已複製連結"; }

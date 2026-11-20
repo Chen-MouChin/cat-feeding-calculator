@@ -100,5 +100,20 @@ t("份量：只有乾糧、只有罐頭、乾濕各半、留 10% 給零食", () 
   assert.equal(treat.foodKcal + treat.treatKcal, 200);   // 零食熱量算進每天的總量
 });
 
+t("理想體重估計：FEDIAF 體態表 6 分 +10–15%、7 分 +20–30%、8 分 +30–40%、9 分 +40% 以上", () => {
+  const r = Calc.idealWeight(6, 7);              // 超重 20%
+  assert.equal(r.high, 5);                        // 6 ÷ 1.2
+  assert.equal(r.low, 4.6);                       // 6 ÷ 1.3 = 4.615
+  assert.deepEqual([Calc.idealWeight(5, 6).low, Calc.idealWeight(5, 6).high], [4.3, 4.5]);   // 5 ÷ 1.15、5 ÷ 1.1
+  assert.deepEqual([Calc.idealWeight(7, 8).low, Calc.idealWeight(7, 8).high], [5, 5.4]);     // 7 ÷ 1.4、7 ÷ 1.3
+  const r9 = Calc.idealWeight(6, 9);
+  assert.equal(r9.low, null);                     // 9 分沒有上限
+  assert.equal(r9.high, 4.3);                     // 6 ÷ 1.4
+  assert.equal(Calc.idealWeight(15, 9).high, 10.7);
+  assert.equal(Calc.idealWeight(5, 5), null);     // 不超重就不估
+  assert.equal(Calc.idealWeight(5, ""), null);
+  assert.equal(Calc.idealWeight(0, 7), null);
+});
+
 console.log(`\n${pass} 通過，${fail} 失敗`);
 process.exit(fail ? 1 : 0);
